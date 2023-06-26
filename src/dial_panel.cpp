@@ -43,15 +43,15 @@ void DialPanel::onDisable()
 
 void DialPanel::lineEditChanged()
 {
-  std::string old_topic_name = topic_name_
+  std::string old_topic_name = topic_name_;
   if(ui_->line_edit->text().isEmpty())
-    topic_name_ = "dial"
+    topic_name_ = "dial";
   else
     topic_name_ = ui_->line_edit->text().toStdString();
   
   RCLCPP_INFO(LOGGER, "You set the topic name : %s", topic_name_.c_str());
   
-  if(old_topic_name != tipc_name_)
+  if(old_topic_name != topic_name_)
     pub_ = node_->create_publisher<std_msgs::msg::Float64>(topic_name_, 1);
 }
 
