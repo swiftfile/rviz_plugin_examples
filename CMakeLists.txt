@@ -11,23 +11,23 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 ###################
 # Depend packages #
 ###################
-find_package(ament_cmake REQUIRED)
-find_package(class_loader REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(rviz2 REQUIRED)
-find_package(rviz_common REQUIRED)
-find_package(rviz_default_plugins REQUIRED)
-find_package(Eigen3 REQUIRED)
+set(THIS_PACKAGE_INCLUDE_DEPENDS
+        ament_cmake
+        class_loader
+        pluginlib
+        rclcpp
+        rclcpp_components
+        std_msgs
+        rviz2
+        rviz_common
+        rviz_default_plugins
+        Eigen3
+        geometry_msgs
+        )
 
-ament_export_dependencies(class_loader REQUIRED)
-ament_export_dependencies(pluginlib REQUIRED)
-ament_export_dependencies(rclcpp REQUIRED)
-ament_export_dependencies(std_msgs REQUIRED)
-ament_export_dependencies(rviz2 REQUIRED)
-ament_export_dependencies(Eigen3 REQUIRED)
+foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
+  find_package(${Dependency} REQUIRED)
+endforeach()
 
 ###############
 # Qt settings #
@@ -51,26 +51,28 @@ set(CMAKE_AUTORCC ON)
 pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
 
 include_directories(
-  include
+        include
 )
 set(HEADERS
-  include/rviz_plugin_examples/dial_panel.h
-)
+        include/rviz_plugin_examples/dial_panel.h
+        )
 qt5_wrap_ui(UIC_FILES
-  src/ui/dial_panel.ui
-)
+        src/ui/dial_panel.ui
+        )
 set(SOURCE_FILES
-  src/dial_panel.cpp
-)
+        src/dial_panel.cpp
+        )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
 ament_target_dependencies(${PROJECT_NAME}
-  std_msgs
-  rviz2
-  Qt5
-  pluginlib
-)
+        rclcpp
+        rviz_common
+        std_msgs
+        rviz2
+        Qt5
+        pluginlib
+        )
 target_include_directories(${PROJECT_NAME} PRIVATE "${OGRE_PREFIX_DIR}/include")
 
 ###########
@@ -79,11 +81,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${OGRE_PREFIX_DIR}/include")
 install(DIRECTORY icons DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY include/ DESTINATION include)
 install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
 
 ament_export_libraries(
-  ${PROJECT_NAME}
-  )
+        ${PROJECT_NAME}
+)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()
